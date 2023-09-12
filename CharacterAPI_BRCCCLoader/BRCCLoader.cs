@@ -17,7 +17,7 @@ namespace CharacterAPI_BRCCCLoader
     {
         public const string ModGuid = "com.Viliger.CharacterAPI_BRCCCLoader";
         public const string ModName = "CharacterAPI_BRCCCLoader";
-        public const string ModVer = "1.0.0";
+        public const string ModVer = "1.0.2";
 
         public static ConfigEntry<bool> LoadBRCCCharacters;
 
@@ -77,18 +77,21 @@ namespace CharacterAPI_BRCCCLoader
             }
         }
 
-        internal static bool HasVoicesGood(CharacterDefinition definition)
+        internal static bool HasVoices(CharacterDefinition definition)
         {
-            return definition.VoiceDie.Length != 0 && definition.VoiceDieFall.Length != 0 && definition.VoiceTalk.Length != 0 && definition.VoiceBoostTrick.Length != 0 && definition.VoiceCombo.Length != 0 && definition.VoiceGetHit.Length != 0 && definition.VoiceJump.Length != 0;
+            return definition.VoiceDie.Length != 0 || definition.VoiceDieFall.Length != 0 || definition.VoiceTalk.Length != 0 || definition.VoiceBoostTrick.Length != 0 || definition.VoiceCombo.Length != 0 || definition.VoiceGetHit.Length != 0 || definition.VoiceJump.Length != 0;
         }
 
         internal static void LoadVoicesFromArray(List<AudioClip> audioClips, AudioClip[] source, string type)
         {
             foreach (AudioClip clip in source)
             {
-                AudioClip newClip = UnityEngine.Object.Instantiate(clip);
-                newClip.name += type;
-                audioClips.Add(newClip);
+                if (clip)
+                {
+                    AudioClip newClip = UnityEngine.Object.Instantiate(clip);
+                    newClip.name += type;
+                    audioClips.Add(newClip);
+                }
             }
         }
 
@@ -109,7 +112,7 @@ namespace CharacterAPI_BRCCCLoader
                     moddedCharacter.AddPersonalGraffiti(definition.GraffitiName, definition.GraffitiName, definition.Graffiti, definition.Graffiti.mainTexture);
                 }
 
-                if (HasVoicesGood(definition))
+                if (HasVoices(definition))
                 {
                     LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceDie, VOICE_DIE);
                     LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceDieFall, VOICE_DIEFALL);
