@@ -110,6 +110,9 @@ namespace CharacterAPI_BRCCCLoader
                 if (definition.Graffiti)
                 {
                     moddedCharacter.AddPersonalGraffiti(definition.GraffitiName, definition.GraffitiName, definition.Graffiti, definition.Graffiti.mainTexture);
+                } else
+                {
+                    moddedCharacter.personalGraffitiBase = (Characters)definition.CharacterToReplace;
                 }
 
                 if (HasVoices(definition))

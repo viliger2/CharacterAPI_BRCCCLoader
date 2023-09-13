@@ -81,3 +81,8 @@ Assmblies/BrcCustomCharactersLib.dll
 Thunderstore/Thunderstore.zip
 Thunderstore/plugins/viliger-BRCCLoader/BrcCustomCharactersLib.dll
 Thunderstore/plugins/viliger-BRCCLoader/CharacterAPI_BRCCCLoader.dll
+BRCCustomCharactersLoader/bin/
+BRCCustomCharactersLoader/obj/
+BRCModelReplacementLoader/bin/
+BRCModelReplacementLoader/obj/
+Thunderstore/BRCCustomCharactersLoader/plugins/viliger-BRCCLoader/

@@ -1,5 +1,5 @@
-# CharacterAPI Loaders (what a mouthful)
-Repository containing loaders for [CharacterAPI](https://github.com/viliger2/BRC_CharacterAPI).
+# CharacterAPI_BRCCCLoader (what a mouthful)
+Loader of [BrcCustomCharacters](https://github.com/SGiygas/BrcCustomCharacters) for [CharacterAPI](https://github.com/viliger2/BRC_CharacterAPI).
 
 ## Credits
 
