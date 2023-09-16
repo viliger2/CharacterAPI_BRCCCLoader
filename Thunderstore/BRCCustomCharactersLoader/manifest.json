@@ -1,6 +1,6 @@
 {
     "name": "CharacterAPI_BRCCCLoader",
-    "version_number": "1.0.2",
+    "version_number": "1.0.3",
     "website_url": "https://github.com/viliger2/CharacterAPI_BRCCCLoader",
     "description": "Loader of BrcCustomCharacters for CharacterAPI.",
     "dependencies": [

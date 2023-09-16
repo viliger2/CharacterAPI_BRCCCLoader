@@ -17,7 +17,7 @@ namespace CharacterAPI_BRCCCLoader
     {
         public const string ModGuid = "com.Viliger.CharacterAPI_BRCCCLoader";
         public const string ModName = "CharacterAPI_BRCCCLoader";
-        public const string ModVer = "1.0.2";
+        public const string ModVer = "1.0.3";
 
         public static ConfigEntry<bool> LoadBRCCCharacters;
 
@@ -77,24 +77,6 @@ namespace CharacterAPI_BRCCCLoader
             }
         }
 
-        internal static bool HasVoices(CharacterDefinition definition)
-        {
-            return definition.VoiceDie.Length != 0 || definition.VoiceDieFall.Length != 0 || definition.VoiceTalk.Length != 0 || definition.VoiceBoostTrick.Length != 0 || definition.VoiceCombo.Length != 0 || definition.VoiceGetHit.Length != 0 || definition.VoiceJump.Length != 0;
-        }
-
-        internal static void LoadVoicesFromArray(List<AudioClip> audioClips, AudioClip[] source, string type)
-        {
-            foreach (AudioClip clip in source)
-            {
-                if (clip)
-                {
-                    AudioClip newClip = UnityEngine.Object.Instantiate(clip);
-                    newClip.name += type;
-                    audioClips.Add(newClip);
-                }
-            }
-        }
-
         internal static void CreateModdedCharacter(CharacterDefinition definition)
         {
             using (var moddedCharacter = new ModdedCharacterConstructor())
@@ -109,8 +91,9 @@ namespace CharacterAPI_BRCCCLoader
 
                 if (definition.Graffiti)
                 {
-                    moddedCharacter.AddPersonalGraffiti(definition.GraffitiName, definition.GraffitiName, definition.Graffiti, definition.Graffiti.mainTexture);
-                } else
+                    moddedCharacter.AddPersonalGraffiti(definition.GraffitiName, definition.GraffitiArtist, definition.Graffiti, definition.Graffiti.mainTexture);
+                }
+                else
                 {
                     moddedCharacter.personalGraffitiBase = (Characters)definition.CharacterToReplace;
                 }
@@ -134,6 +117,24 @@ namespace CharacterAPI_BRCCCLoader
                 moddedCharacter.usesCustomShader = !definition.UseReptileShader;
 
                 moddedCharacter.CreateModdedCharacter();
+            }
+        }
+
+        internal static bool HasVoices(CharacterDefinition definition)
+        {
+            return definition.VoiceDie.Length != 0 || definition.VoiceDieFall.Length != 0 || definition.VoiceTalk.Length != 0 || definition.VoiceBoostTrick.Length != 0 || definition.VoiceCombo.Length != 0 || definition.VoiceGetHit.Length != 0 || definition.VoiceJump.Length != 0;
+        }
+
+        internal static void LoadVoicesFromArray(List<AudioClip> audioClips, AudioClip[] source, string type)
+        {
+            foreach (AudioClip clip in source)
+            {
+                if (clip)
+                {
+                    AudioClip newClip = UnityEngine.Object.Instantiate(clip);
+                    newClip.name += type;
+                    audioClips.Add(newClip);
+                }
             }
         }
     }

@@ -1,4 +1,6 @@
-﻿using BrcCustomCharactersLib;
+﻿using BrcCustomCharacters;
+using BrcCustomCharacters.Data;
+using BrcCustomCharactersLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -26,8 +28,8 @@ namespace CharacterAPI_BRCCCLoader
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
         public static void LoadBrcCustomCharacters()
         {
-            Type type = typeof(AssetDatabase);
-            Dictionary<Guid, CharacterDefinition> characterObjects = (Dictionary<Guid, CharacterDefinition>)type.GetField("_characterObjects", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            Type type = typeof(CharacterDatabase);
+            Dictionary<Guid, CustomCharacter> characterObjects = (Dictionary<Guid, CustomCharacter>)type.GetField("_customCharacters", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             //Dictionary<Guid, string> _characterBundlePaths = (Dictionary<Guid, string>)type.GetField("_characterBundlePaths", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             //Dictionary<Guid, SfxCollection> _characterSfxCollections = (Dictionary<Guid, SfxCollection>)type.GetField("_characterSfxCollections", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             //Dictionary<Guid, GameObject> _characterVisuals = (Dictionary<Guid, GameObject>)type.GetField("_characterVisuals", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
@@ -35,7 +37,7 @@ namespace CharacterAPI_BRCCCLoader
 
             foreach (var characterObject in characterObjects.Values)
             {
-                BRCCLoader.CreateModdedCharacter(characterObject);
+                BRCCLoader.CreateModdedCharacter(characterObject.Definition);
             }
 
             //_characterBundlePaths.Clear();
