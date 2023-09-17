@@ -19,7 +19,7 @@ namespace ModelReplacementLoader
 
         public ConfigEntry<bool> shaderOverwritten;
 
-        public void Init(ConfigFile config) 
+        public void Init(ConfigFile config)
         {
             charaToReplace = config.Bind<int>("General", "charaToReplace", 0, "Which character to replace, taken from the 'Characters' enum. See this image (The numbers are one digit more than they should be, so what would be 2 in this image is actually 1, 3 is 2, 4 is 3, and so on): https://files.catbox.moe/vhda8a.png");
 

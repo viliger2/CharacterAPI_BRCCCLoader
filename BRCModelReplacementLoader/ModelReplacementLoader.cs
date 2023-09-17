@@ -19,9 +19,11 @@ namespace ModelReplacementLoader
         public const string ModName = "CharacterAPI_ModelReplacementLoader";
         public const string ModVer = "1.0.0";
 
+        private const string FOLDER_NAME = "ModelReplacements";
+
         public void Awake()
         {
-            string modelFolder = Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "ModelReplacements");
+            string modelFolder = Path.Combine(CharacterAPI.CharacterAPI.NewSavePath, FOLDER_NAME);
             Directory.CreateDirectory(modelFolder);
 
             var referenceAssetBundle = AssetBundle.LoadFromFile(Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "beat"));
@@ -32,7 +34,7 @@ namespace ModelReplacementLoader
             }
 
             var referenceGameObject = referenceAssetBundle.LoadAsset<GameObject>("beat_no_blades");
-            if(!referenceGameObject)
+            if (!referenceGameObject)
             {
                 Logger.LogError("Reference asset bundle has been replaced.");
                 return;
@@ -45,14 +47,14 @@ namespace ModelReplacementLoader
                 string[] configs = Directory.GetFiles(folder, "*.cfg");
                 string[] assetBundles = Directory.GetFiles(folder, "*.asset").Concat(Directory.GetFiles(folder, "*.")).ToArray();
 
-                if(configs.Length == 0)
+                if (configs.Length == 0)
                 {
                     Logger.LogMessage($"Directory {folder} contains no config file. Default options will be applied and new config file will be created.");
                 }
 
                 string configName = configs.Length > 0 ? configs[0] : string.Concat(Path.Combine(folder, characterName), ".cfg");
 
-                if(assetBundles.Length == 0)
+                if (assetBundles.Length == 0)
                 {
                     Logger.LogWarning($"Directory {folder} contains no asset bundles. Skipping...");
                     continue;
@@ -76,10 +78,12 @@ namespace ModelReplacementLoader
                     continue;
                 }
 
-                using(var moddedCharacter = new ModdedCharacterConstructor())
+                using (var moddedCharacter = new ModdedCharacterConstructor())
                 {
                     moddedCharacter.characterName = characterName;
                     moddedCharacter.characterPrefab = FixModel(referenceGameObject, characterPrefab);
+
+                    moddedCharacter.skipTransformsCheck = true;
 
                     moddedCharacter.AddOutfit(characterPrefab.GetComponentInChildren<SkinnedMeshRenderer>().material);
 
@@ -88,21 +92,23 @@ namespace ModelReplacementLoader
 
                     moddedCharacter.usesCustomShader = characterConfig.shaderOverwritten.Value;
 
-                    if (!characterConfig.inlineSkatesDir.Value.Equals((Vector3)characterConfig.inlineSkatesDir.DefaultValue) 
-                        && characterConfig.inlineSkatesDirL.Value.Equals(characterConfig.inlineSkatesDirL.DefaultValue) 
+                    if (!characterConfig.inlineSkatesDir.Value.Equals((Vector3)characterConfig.inlineSkatesDir.DefaultValue)
+                        && characterConfig.inlineSkatesDirL.Value.Equals(characterConfig.inlineSkatesDirL.DefaultValue)
                         && characterConfig.inlineSkatesDirR.Value.Equals(characterConfig.inlineSkatesDirR.DefaultValue))
                     {
                         moddedCharacter.AddSkatePosition(ModdedCharacterConstructor.Skate.Left, characterConfig.inlineSkatesPosL.Value, characterConfig.inlineSkatesDir.Value, characterConfig.inlineSkatesScaleL.Value);
                         moddedCharacter.AddSkatePosition(ModdedCharacterConstructor.Skate.Right, characterConfig.inlineSkatesPosR.Value, characterConfig.inlineSkatesDir.Value, characterConfig.inlineSkatesScaleR.Value);
-                    } else
+                    }
+                    else
                     {
                         moddedCharacter.AddSkatePosition(ModdedCharacterConstructor.Skate.Left, characterConfig.inlineSkatesPosL.Value, characterConfig.inlineSkatesDirL.Value, characterConfig.inlineSkatesScaleL.Value);
                         moddedCharacter.AddSkatePosition(ModdedCharacterConstructor.Skate.Right, characterConfig.inlineSkatesPosR.Value, characterConfig.inlineSkatesDirR.Value, characterConfig.inlineSkatesScaleR.Value);
                     }
 
                     moddedCharacter.CreateModdedCharacter();
-                    AssetBundle.UnloadAllAssetBundles(false);
                 }
+
+                assetBundle.Unload(false);
             }
         }
 

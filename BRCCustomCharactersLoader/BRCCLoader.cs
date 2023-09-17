@@ -1,8 +1,10 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using BrcCustomCharactersLib;
 using CharacterAPI;
 using Reptile;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -17,29 +19,28 @@ namespace CharacterAPI_BRCCCLoader
     {
         public const string ModGuid = "com.Viliger.CharacterAPI_BRCCCLoader";
         public const string ModName = "CharacterAPI_BRCCCLoader";
-        public const string ModVer = "1.0.3";
+        public const string ModVer = "1.0.4";
+
+        private const string FOLDER_NAME = "BrcCustomCharacters";
+
+        public static ManualLogSource logger;
 
         public static ConfigEntry<bool> LoadBRCCCharacters;
 
         public static ConfigEntry<bool> LoadBRCCPlugin;
 
-        internal const string VOICE_BOOST = "_boost";
-        internal const string VOICE_COMBO = "_combo";
-        internal const string VOICE_DIE = "_die";
-        internal const string VOICE_DIEFALL = "_falldamage";
-        internal const string VOICE_GETHIT = "_gethit";
-        internal const string VOICE_JUMP = "_jump";
-        internal const string VOICE_TALK = "_talk";
-
         public void Awake()
         {
+            logger = this.Logger;
+
             LoadBRCCCharacters = Config.Bind<bool>("BRCCustomCharacters Loader", "Load BRCCustomCharacters", true, "Loads characters made for BRCCustomCharacters as their own characters. It loads from \"BRCCustomCharacters\" folder.");
             LoadBRCCPlugin = Config.Bind<bool>("BRCCustomCharacters Loader", "Load BRCCustomCharacters from Plugin", false, "Loads characters FROM BRCCustomCharacters as their own characters. This is different from the option above. It means that any supported character loaded by BRCCustomCharacters will also recieve an independent copy. This, however, will not disable any replacements (voice, character, etc).");
 
+            AttemptToMoveCharacters(Info);
+
             if (LoadBRCCCharacters.Value)
             {
-                LoadBrcCCharacters(Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "BrcCustomCharacters"));
-                LoadBrcCCharacters(Path.Combine(System.IO.Path.GetDirectoryName(CharacterAPI.CharacterAPI.DllPath), "BrcCustomCharacters"));
+                LoadBrcCCharacters(Path.Combine(CharacterAPI.CharacterAPI.NewSavePath, FOLDER_NAME));
             }
 
             if (LoadBRCCPlugin.Value && BRCCompat.enabled)
@@ -49,6 +50,38 @@ namespace CharacterAPI_BRCCCLoader
 
         }
 
+        private static void AttemptToMoveCharacters(PluginInfo Info)
+        {
+            try
+            {
+                string oldPathAPIFolder = Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), FOLDER_NAME);
+                string oldPathLoaderFodler = Path.Combine(System.IO.Path.GetDirectoryName(CharacterAPI.CharacterAPI.DllPath), FOLDER_NAME);
+
+                string newPath = Path.Combine(CharacterAPI.CharacterAPI.NewSavePath, FOLDER_NAME);
+                Directory.CreateDirectory(newPath);
+                if (Directory.Exists(oldPathAPIFolder)) 
+                { 
+                    foreach (string filePath in Directory.GetFiles(oldPathAPIFolder))
+                    {
+                        File.Move(filePath, Path.Combine(newPath, Path.GetFileName(filePath)));
+                    }
+                    Directory.Delete(oldPathAPIFolder, true);
+                }
+
+                if (Directory.Exists(oldPathLoaderFodler))
+                {
+                    foreach (string filePath in Directory.GetFiles(oldPathLoaderFodler))
+                    {
+                        File.Move(filePath, Path.Combine(newPath, Path.GetFileName(filePath)));
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                logger.LogWarning($"Exception during moving character asset bundles to new location. Exception: {e}, Message: {e.Message}.");
+            }
+        }
+
         private static void LoadBrcCCharacters(string pluginPath)
         {
             Directory.CreateDirectory(pluginPath);
@@ -56,10 +89,16 @@ namespace CharacterAPI_BRCCCLoader
             foreach (string filePath in Directory.GetFiles(pluginPath))
             {
                 AssetBundle bundle = AssetBundle.LoadFromFile(filePath);
+                logger.LogMessage(filePath);
                 if (bundle != null)
                 {
                     CharacterDefinition definition = null;
                     GameObject[] objects = bundle.LoadAllAssets<GameObject>();
+                    if(objects.Length == 0)
+                    {
+                        logger.LogWarning($"Asset bundle {Path.GetFileName(filePath)} doesn't have any prefabs.");
+                        continue;
+                    }
                     foreach (GameObject obj in objects)
                     {
                         definition = obj.GetComponent<CharacterDefinition>();
@@ -72,6 +111,9 @@ namespace CharacterAPI_BRCCCLoader
                     if (definition)
                     {
                         CreateModdedCharacter(definition);
+                    } else
+                    {
+                        logger.LogWarning($"Asset bundle {Path.GetFileName(filePath)} doesn't have CharacterDefinition class attached to its prefab.");
                     }
                 }
             }
@@ -100,13 +142,13 @@ namespace CharacterAPI_BRCCCLoader
 
                 if (HasVoices(definition))
                 {
-                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceDie, VOICE_DIE);
-                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceDieFall, VOICE_DIEFALL);
-                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceTalk, VOICE_TALK);
-                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceBoostTrick, VOICE_BOOST);
-                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceCombo, VOICE_COMBO);
-                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceGetHit, VOICE_GETHIT);
-                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceJump, VOICE_JUMP);
+                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceDie, CharacterAPI.Hooks.CoreHooks.VOICE_DIE);
+                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceDieFall, CharacterAPI.Hooks.CoreHooks.VOICE_DIEFALL);
+                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceTalk, CharacterAPI.Hooks.CoreHooks.VOICE_TALK);
+                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceBoostTrick, CharacterAPI.Hooks.CoreHooks.VOICE_BOOST);
+                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceCombo, CharacterAPI.Hooks.CoreHooks.VOICE_COMBO);
+                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceGetHit, CharacterAPI.Hooks.CoreHooks.VOICE_GETHIT);
+                    LoadVoicesFromArray(moddedCharacter.audioClips, definition.VoiceJump, CharacterAPI.Hooks.CoreHooks.VOICE_JUMP);
                 }
                 else
                 {
