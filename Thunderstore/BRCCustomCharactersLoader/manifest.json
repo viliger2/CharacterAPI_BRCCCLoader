@@ -1,10 +1,10 @@
 {
     "name": "CharacterAPI_BRCCCLoader",
-    "version_number": "1.0.4",
+    "version_number": "1.0.5",
     "website_url": "https://github.com/viliger2/CharacterAPI_BRCCCLoader",
-    "description": "Loader of BrcCustomCharacters for CharacterAPI. Read the changelog!",
+    "description": "Loader of BrcCustomCharacters for CharacterAPI.",
     "dependencies": [
 	    "BepInEx-BepInExPack-5.4.2100",
-		"viliger-CharacterAPI-0.9.1"
+		"viliger-CharacterAPI-0.9.3"
     ]
 }

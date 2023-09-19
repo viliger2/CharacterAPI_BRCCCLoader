@@ -19,7 +19,7 @@ namespace CharacterAPI_BRCCCLoader
     {
         public const string ModGuid = "com.Viliger.CharacterAPI_BRCCCLoader";
         public const string ModName = "CharacterAPI_BRCCCLoader";
-        public const string ModVer = "1.0.4";
+        public const string ModVer = "1.0.5";
 
         private const string FOLDER_NAME = "BrcCustomCharacters";
 
@@ -89,7 +89,6 @@ namespace CharacterAPI_BRCCCLoader
             foreach (string filePath in Directory.GetFiles(pluginPath))
             {
                 AssetBundle bundle = AssetBundle.LoadFromFile(filePath);
-                logger.LogMessage(filePath);
                 if (bundle != null)
                 {
                     CharacterDefinition definition = null;

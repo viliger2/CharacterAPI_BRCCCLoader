@@ -1,4 +1,13 @@
 <details>
+<summary>1.0.5 </summary>
+
+* Readme update (it had wrong info).
+* Removed debug logging.
+* Small performance optimizations.
+
+</details>
+
+<details>
 <summary>1.0.4 </summary>
 
 * Moved BrcCustomCharacters folder from plugin folder to CharacterAPI folder inside Bepin folder.
